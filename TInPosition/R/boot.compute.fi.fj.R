@@ -17,14 +17,21 @@ boot.compute.fi.fj <- function(DATA,DESIGN,res){
 	boot.sample.vector <- boot.samples(DATA,DESIGN,constrained=TRUE)	
 	BootX <- DATA[boot.sample.vector,]	
 	
-	
 	if((class(res)[1] %in% c(pca.types))){
+		BootX <- expo.scale(BootX, center = res$center, scale = res$scale)
+	
+		# changed so that Rboot is not centered and scaled a second time when
+		# it goes into supplementaryRows/Cols
+		res$center <- FALSE
+		res$scale <- FALSE
+		
 		massedDESIGN <- t(t(DESIGN) * (1/(colSums(DESIGN))))		
 		BootY <- massedDESIGN[boot.sample.vector,]
 	}
 	if((class(res)[1] %in% c(ca.types))){
 		BootY <- DESIGN[boot.sample.vector,]		
-	}	
+	}
+	
 	Rboot<-t(BootY) %*% BootX
 	
 	
